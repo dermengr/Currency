@@ -13,7 +13,7 @@ const router = express.Router();
 
 // Validation middleware
 const currencyPairValidation = [
-    check('fromCurrency')
+    check('baseCurrency')
         .trim()
         .notEmpty()
         .withMessage('Source currency is required')
@@ -21,7 +21,7 @@ const currencyPairValidation = [
         .withMessage('Currency code must be 3 characters')
         .isUppercase()
         .withMessage('Currency code must be uppercase'),
-    check('toCurrency')
+    check('targetCurrency')
         .trim()
         .notEmpty()
         .withMessage('Target currency is required')
@@ -37,13 +37,13 @@ const currencyPairValidation = [
 ];
 
 const convertValidation = [
-    check('fromCurrency')
+    check('baseCurrency')
         .trim()
         .notEmpty()
         .withMessage('Source currency is required')
         .isLength({ min: 3, max: 3 })
         .withMessage('Currency code must be 3 characters'),
-    check('toCurrency')
+    check('targetCurrency')
         .trim()
         .notEmpty()
         .withMessage('Target currency is required')
@@ -57,8 +57,8 @@ const convertValidation = [
 ];
 
 // Public routes
-router.get('/', getCurrencyPairs);
-router.post('/convert', convertValidation, convertCurrency);
+router.get('/', protect, getCurrencyPairs); // Make it protected to ensure authentication
+router.post('/convert', protect, convertValidation, convertCurrency);
 
 // Protected admin routes
 router.post('/', protect, admin, currencyPairValidation, createCurrencyPair);

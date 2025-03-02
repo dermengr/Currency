@@ -9,7 +9,16 @@ const authService = {
                 username,
                 password
             });
-            return response.data;
+            
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Login failed');
+            }
+            
+            return {
+                success: true,
+                user: response.data.user,
+                token: response.data.token
+            };
         } catch (error) {
             throw error.response?.data || { message: 'An error occurred during login' };
         }
@@ -22,7 +31,16 @@ const authService = {
                 password,
                 role
             });
-            return response.data;
+            
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Registration failed');
+            }
+            
+            return {
+                success: true,
+                user: response.data.user,
+                token: response.data.token
+            };
         } catch (error) {
             throw error.response?.data || { message: 'An error occurred during registration' };
         }
@@ -35,7 +53,15 @@ const authService = {
                     Authorization: `Bearer ${token}`
                 }
             });
-            return response.data;
+            
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to fetch profile');
+            }
+            
+            return {
+                success: true,
+                user: response.data.user
+            };
         } catch (error) {
             throw error.response?.data || { message: 'An error occurred fetching profile' };
         }

@@ -6,7 +6,7 @@ const CurrencyPair = require('../models/currencyPairModel');
 // @access  Public
 const getCurrencyPairs = async (req, res) => {
     try {
-        const currencyPairs = await CurrencyPair.find().sort({ fromCurrency: 1 });
+        const currencyPairs = await CurrencyPair.find().sort({ baseCurrency: 1 });
         res.json({
             success: true,
             data: currencyPairs
@@ -34,12 +34,12 @@ const createCurrencyPair = async (req, res) => {
             });
         }
 
-        const { fromCurrency, toCurrency, rate } = req.body;
+        const { baseCurrency, targetCurrency, rate } = req.body;
 
         // Check if currency pair already exists
         const existingPair = await CurrencyPair.findOne({
-            fromCurrency: fromCurrency.toUpperCase(),
-            toCurrency: toCurrency.toUpperCase()
+            baseCurrency: baseCurrency.toUpperCase(),
+            targetCurrency: targetCurrency.toUpperCase()
         });
 
         if (existingPair) {
@@ -51,8 +51,8 @@ const createCurrencyPair = async (req, res) => {
 
         // Create currency pair
         const currencyPair = await CurrencyPair.create({
-            fromCurrency: fromCurrency.toUpperCase(),
-            toCurrency: toCurrency.toUpperCase(),
+            baseCurrency: baseCurrency.toUpperCase(),
+            targetCurrency: targetCurrency.toUpperCase(),
             rate
         });
 
@@ -96,11 +96,11 @@ const updateCurrencyPair = async (req, res) => {
         if (req.body.rate) {
             currencyPair.rate = req.body.rate;
         }
-        if (req.body.fromCurrency) {
-            currencyPair.fromCurrency = req.body.fromCurrency.toUpperCase();
+        if (req.body.baseCurrency) {
+            currencyPair.baseCurrency = req.body.baseCurrency.toUpperCase();
         }
-        if (req.body.toCurrency) {
-            currencyPair.toCurrency = req.body.toCurrency.toUpperCase();
+        if (req.body.targetCurrency) {
+            currencyPair.targetCurrency = req.body.targetCurrency.toUpperCase();
         }
 
         const updatedPair = await currencyPair.save();
@@ -152,7 +152,7 @@ const deleteCurrencyPair = async (req, res) => {
 // @access  Public
 const convertCurrency = async (req, res) => {
     try {
-        const { fromCurrency, toCurrency, amount } = req.body;
+        const { baseCurrency, targetCurrency, amount } = req.body;
 
         if (!amount || amount <= 0) {
             return res.status(400).json({
@@ -162,8 +162,8 @@ const convertCurrency = async (req, res) => {
         }
 
         const currencyPair = await CurrencyPair.findOne({
-            fromCurrency: fromCurrency.toUpperCase(),
-            toCurrency: toCurrency.toUpperCase()
+            baseCurrency: baseCurrency.toUpperCase(),
+            targetCurrency: targetCurrency.toUpperCase()
         });
 
         if (!currencyPair) {
@@ -178,8 +178,8 @@ const convertCurrency = async (req, res) => {
         res.json({
             success: true,
             data: {
-                fromCurrency: currencyPair.fromCurrency,
-                toCurrency: currencyPair.toCurrency,
+                baseCurrency: currencyPair.baseCurrency,
+                targetCurrency: currencyPair.targetCurrency,
                 amount,
                 convertedAmount,
                 rate: currencyPair.rate

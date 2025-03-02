@@ -10,8 +10,8 @@ const AdminDashboard = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingPair, setEditingPair] = useState(null);
     const [formData, setFormData] = useState({
-        fromCurrency: '',
-        toCurrency: '',
+        baseCurrency: '',
+        targetCurrency: '',
         rate: ''
     });
 
@@ -21,7 +21,7 @@ const AdminDashboard = () => {
 
     const fetchCurrencyPairs = async () => {
         try {
-            const response = await currencyService.getAllPairs();
+            const response = await currencyService.getAllPairs(token);
             if (response.success) {
                 setCurrencyPairs(response.data);
             }
@@ -34,15 +34,15 @@ const AdminDashboard = () => {
         if (pair) {
             setEditingPair(pair);
             setFormData({
-                fromCurrency: pair.fromCurrency,
-                toCurrency: pair.toCurrency,
-                rate: pair.rate.toString()
+                baseCurrency: pair.baseCurrency || '',
+                targetCurrency: pair.targetCurrency || '',
+                rate: pair.rate ? pair.rate.toString() : ''
             });
         } else {
             setEditingPair(null);
             setFormData({
-                fromCurrency: '',
-                toCurrency: '',
+                baseCurrency: '',
+                targetCurrency: '',
                 rate: ''
             });
         }
@@ -53,10 +53,16 @@ const AdminDashboard = () => {
         setShowModal(false);
         setEditingPair(null);
         setFormData({
-            fromCurrency: '',
-            toCurrency: '',
+            baseCurrency: '',
+            targetCurrency: '',
             rate: ''
         });
+    };
+
+    // Create a custom event for currency pair updates
+    const emitCurrencyPairUpdate = () => {
+        const event = new CustomEvent('currencyPairUpdate');
+        window.dispatchEvent(event);
     };
 
     const handleSubmit = async (e) => {
@@ -77,7 +83,8 @@ const AdminDashboard = () => {
             }
 
             handleCloseModal();
-            fetchCurrencyPairs();
+            await fetchCurrencyPairs();
+            emitCurrencyPairUpdate(); // Notify other components
         } catch (err) {
             setError(err.message || 'Failed to save currency pair');
         } finally {
@@ -90,7 +97,8 @@ const AdminDashboard = () => {
             setError('');
             try {
                 await currencyService.deletePair(id, token);
-                fetchCurrencyPairs();
+                await fetchCurrencyPairs();
+                emitCurrencyPairUpdate(); // Notify other components
             } catch (err) {
                 setError(err.message || 'Failed to delete currency pair');
             }
@@ -131,8 +139,8 @@ const AdminDashboard = () => {
                             <tbody>
                                 {currencyPairs.map((pair) => (
                                     <tr key={pair._id}>
-                                        <td>{pair.fromCurrency}</td>
-                                        <td>{pair.toCurrency}</td>
+                                        <td>{pair.baseCurrency}</td>
+                                        <td>{pair.targetCurrency}</td>
                                         <td>{pair.rate}</td>
                                         <td>
                                             {new Date(pair.lastUpdated).toLocaleString()}
@@ -182,30 +190,30 @@ const AdminDashboard = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">
                                 <div className="mb-3">
-                                    <label htmlFor="fromCurrency" className="form-label">From Currency</label>
+                                    <label htmlFor="baseCurrency" className="form-label">From Currency</label>
                                     <input
                                         type="text"
                                         className="form-control"
-                                        id="fromCurrency"
-                                        value={formData.fromCurrency}
+                                        id="baseCurrency"
+                                        value={formData.baseCurrency}
                                         onChange={(e) => setFormData({ 
                                             ...formData, 
-                                            fromCurrency: e.target.value.toUpperCase() 
+                                            baseCurrency: e.target.value.toUpperCase() 
                                         })}
                                         placeholder="e.g., USD"
                                         required
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="toCurrency" className="form-label">To Currency</label>
+                                    <label htmlFor="targetCurrency" className="form-label">To Currency</label>
                                     <input
                                         type="text"
                                         className="form-control"
-                                        id="toCurrency"
-                                        value={formData.toCurrency}
+                                        id="targetCurrency"
+                                        value={formData.targetCurrency}
                                         onChange={(e) => setFormData({ 
                                             ...formData, 
-                                            toCurrency: e.target.value.toUpperCase() 
+                                            targetCurrency: e.target.value.toUpperCase() 
                                         })}
                                         placeholder="e.g., EUR"
                                         required

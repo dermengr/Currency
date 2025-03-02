@@ -29,7 +29,14 @@ const AppContent = () => {
         <Navbar />
         <div className="flex-grow-1">
           <Routes>
-            <Route path="/" element={<CurrencyConverter />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <CurrencyConverter />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route
               path="/admin"

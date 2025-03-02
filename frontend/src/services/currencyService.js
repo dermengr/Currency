@@ -4,26 +4,67 @@ const API_URL = 'http://localhost:5000/api/currency';
 
 const currencyService = {
     // Get all currency pairs
-    getAllPairs: async () => {
+    getAllPairs: async (token) => {
         try {
-            const response = await axios.get(API_URL);
-            return response.data;
+            const response = await axios.get(`${API_URL}/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to fetch currency pairs');
+            }
+            return {
+                success: true,
+                data: response.data.data || []
+            };
         } catch (error) {
-            throw error.response?.data || { message: 'Error fetching currency pairs' };
+            console.error('Error fetching pairs:', error);
+            throw {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Error fetching currency pairs'
+            };
         }
     },
 
     // Convert currency
-    convertCurrency: async (fromCurrency, toCurrency, amount) => {
+    convertCurrency: async (baseCurrency, targetCurrency, amount, token) => {
         try {
+            if (!amount || amount <= 0) {
+                throw new Error('Please enter a valid amount');
+            }
+
+            if (!baseCurrency || !targetCurrency) {
+                throw new Error('Please select both currencies');
+            }
+
             const response = await axios.post(`${API_URL}/convert`, {
-                fromCurrency,
-                toCurrency,
-                amount
+                baseCurrency,
+                targetCurrency,
+                amount: parseFloat(amount)
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-            return response.data;
+
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Conversion failed');
+            }
+
+            return {
+                success: true,
+                data: {
+                    convertedAmount: response.data.data.convertedAmount,
+                    rate: response.data.data.rate
+                }
+            };
         } catch (error) {
-            throw error.response?.data || { message: 'Error converting currency' };
+            console.error('Error converting:', error);
+            throw {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Error converting currency'
+            };
         }
     },
 
@@ -37,7 +78,7 @@ const currencyService = {
             });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Error creating currency pair' };
+            throw new Error(error.response?.data?.message || 'Error creating currency pair');
         }
     },
 
@@ -50,7 +91,7 @@ const currencyService = {
             });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Error updating currency pair' };
+            throw new Error(error.response?.data?.message || 'Error updating currency pair');
         }
     },
 
@@ -63,7 +104,7 @@ const currencyService = {
             });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Error deleting currency pair' };
+            throw new Error(error.response?.data?.message || 'Error deleting currency pair');
         }
     }
 };

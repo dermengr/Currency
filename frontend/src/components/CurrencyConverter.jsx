@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import currencyService from '../services/currencyService';
+import { useAuth } from '../context/AuthContext';
 
 const CurrencyConverter = () => {
     const [amount, setAmount] = useState('');
@@ -10,38 +11,85 @@ const CurrencyConverter = () => {
     const [loading, setLoading] = useState(false);
     const [currencyPairs, setCurrencyPairs] = useState([]);
 
-    useEffect(() => {
-        fetchCurrencyPairs();
-    }, []);
+    const { token } = useAuth();
 
-    const fetchCurrencyPairs = async () => {
-        try {
-            const response = await currencyService.getAllPairs();
-            if (response.success) {
-                setCurrencyPairs(response.data);
-                if (response.data.length > 0) {
-                    setFromCurrency(response.data[0].fromCurrency);
-                    setToCurrency(response.data[0].toCurrency);
-                }
+    useEffect(() => {
+        const initializeCurrencyPairs = async () => {
+            if (!token) {
+                setError('Please log in to use the currency converter');
+                return;
             }
-        } catch (err) {
-            setError('Failed to fetch currency pairs');
-        }
-    };
+            try {
+                const response = await currencyService.getAllPairs(token);
+                if (response.success) {
+                    setCurrencyPairs(response.data);
+                    // Only set initial currencies if none are selected
+                    if ((!fromCurrency || !toCurrency) && response.data.length > 0) {
+                        const firstPair = response.data[0];
+                        setFromCurrency(firstPair.baseCurrency);
+                        setToCurrency(firstPair.targetCurrency);
+                    }
+                }
+            } catch (err) {
+                setError('Failed to fetch currency pairs');
+                console.error('Error fetching pairs:', err);
+            }
+        };
+
+        // Initial fetch
+        initializeCurrencyPairs();
+        
+        // Set up event listeners
+        const handleCurrencyPairUpdate = () => initializeCurrencyPairs();
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                initializeCurrencyPairs();
+            }
+        };
+
+        // Poll for updates every 30 seconds
+        const interval = setInterval(initializeCurrencyPairs, 30000);
+        
+        // Add event listeners
+        window.addEventListener('currencyPairUpdate', handleCurrencyPairUpdate);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Cleanup on unmount
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('currencyPairUpdate', handleCurrencyPairUpdate);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [fromCurrency, toCurrency, token]);
+
 
     const handleConvert = async () => {
         setError('');
         setResult(null);
         setLoading(true);
 
+        if (!token) {
+            setError('Please log in to use the currency converter');
+            setLoading(false);
+            return;
+        }
+
         try {
+            console.log('Converting:', { fromCurrency, toCurrency, amount });
             const response = await currencyService.convertCurrency(
                 fromCurrency,
                 toCurrency,
-                parseFloat(amount)
+                parseFloat(amount),
+                token
             );
-            if (response.success) {
-                setResult(response.data);
+            console.log('Response:', response);
+            if (response.success && response.data) {
+                setResult({
+                    convertedAmount: Number(response.data.convertedAmount),
+                    rate: Number(response.data.rate)
+                });
+            } else {
+                throw new Error(response.message || 'Failed to convert currency');
             }
         } catch (err) {
             setError(err.message || 'Failed to convert currency');
@@ -51,19 +99,30 @@ const CurrencyConverter = () => {
     };
 
     const handleSwap = () => {
-        setFromCurrency(toCurrency);
-        setToCurrency(fromCurrency);
-        setResult(null);
+        // Check if the reverse pair exists
+        const reversePairExists = currencyPairs.some(
+            pair => pair.baseCurrency === toCurrency && pair.targetCurrency === fromCurrency
+        );
+        
+        if (reversePairExists) {
+            setFromCurrency(toCurrency);
+            setToCurrency(fromCurrency);
+            setResult(null);
+        } else {
+            setError('Cannot swap - conversion rate not available for this direction');
+        }
     };
 
-    // Get unique currencies from pairs
-    const getUniqueCurrencies = () => {
-        const currencies = new Set();
-        currencyPairs.forEach(pair => {
-            currencies.add(pair.fromCurrency);
-            currencies.add(pair.toCurrency);
-        });
-        return Array.from(currencies).sort();
+    // Get valid currency pairs
+    const getValidPairs = () => {
+        const fromCurrencies = [...new Set(currencyPairs.map(pair => pair.baseCurrency))].sort();
+        const getValidToCurrencies = (from) => {
+            return currencyPairs
+                .filter(pair => pair.baseCurrency === from)
+                .map(pair => pair.targetCurrency)
+                .sort();
+        };
+        return { fromCurrencies, getValidToCurrencies };
     };
 
     return (
@@ -101,10 +160,20 @@ const CurrencyConverter = () => {
                                         className="form-select"
                                         id="fromCurrency"
                                         value={fromCurrency}
-                                        onChange={(e) => setFromCurrency(e.target.value)}
+                                        onChange={(e) => {
+                                            const newFromCurrency = e.target.value;
+                                            setFromCurrency(newFromCurrency);
+                                            // Reset toCurrency when fromCurrency changes
+                                            const validToCurrencies = getValidPairs().getValidToCurrencies(newFromCurrency);
+                                            if (!validToCurrencies.includes(toCurrency)) {
+                                                setToCurrency(validToCurrencies[0] || '');
+                                            }
+                                            setResult(null);
+                                        }}
                                     >
-                                        {getUniqueCurrencies().map((currency) => (
-                                            <option key={currency} value={currency}>
+                                        <option key="default-from" value="">Select currency</option>
+                                        {getValidPairs().fromCurrencies.map((currency) => (
+                                            <option key={`from-${currency}`} value={currency}>
                                                 {currency}
                                             </option>
                                         ))}
@@ -127,10 +196,14 @@ const CurrencyConverter = () => {
                                         className="form-select"
                                         id="toCurrency"
                                         value={toCurrency}
-                                        onChange={(e) => setToCurrency(e.target.value)}
+                                        onChange={(e) => {
+                                            setToCurrency(e.target.value);
+                                            setResult(null);
+                                        }}
                                     >
-                                        {getUniqueCurrencies().map((currency) => (
-                                            <option key={currency} value={currency}>
+                                        <option key="default-to" value="">Select currency</option>
+                                        {fromCurrency && getValidPairs().getValidToCurrencies(fromCurrency).map((currency) => (
+                                            <option key={`to-${currency}`} value={currency}>
                                                 {currency}
                                             </option>
                                         ))}
@@ -141,7 +214,7 @@ const CurrencyConverter = () => {
                             <button
                                 className="btn btn-primary w-100"
                                 onClick={handleConvert}
-                                disabled={loading || !amount || !fromCurrency || !toCurrency}
+                                disabled={loading || !amount || !fromCurrency || !toCurrency || !token}
                             >
                                 {loading ? (
                                     <>
@@ -155,10 +228,10 @@ const CurrencyConverter = () => {
                                 <div className="mt-4 text-center">
                                     <h3 className="mb-3">Result</h3>
                                     <div className="h4 text-primary mb-2">
-                                        {amount} {fromCurrency} = {result.convertedAmount.toFixed(2)} {toCurrency}
+                                        {amount} {fromCurrency} = {typeof result.convertedAmount === 'number' ? result.convertedAmount.toFixed(2) : '0.00'} {toCurrency}
                                     </div>
                                     <div className="text-muted">
-                                        Exchange Rate: 1 {fromCurrency} = {result.rate} {toCurrency}
+                                        Exchange Rate: 1 {fromCurrency} = {typeof result.rate === 'number' ? result.rate.toFixed(4) : '0.00'} {toCurrency}
                                     </div>
                                 </div>
                             )}

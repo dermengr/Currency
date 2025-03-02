@@ -19,18 +19,42 @@ const registerUser = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
-                errors: errors.array()
+                message: errors.array()[0].msg
             });
         }
 
-        const { username, password, role } = req.body;
+        const { username, password } = req.body;
+
+        // Validate input
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide both username and password'
+            });
+        }
+
+        // Check username length
+        if (username.length < 3) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username must be at least 3 characters long'
+            });
+        }
+
+        // Check password length
+        if (password.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
 
         // Check if user exists
         const userExists = await User.findOne({ username });
         if (userExists) {
             return res.status(400).json({
                 success: false,
-                message: 'User already exists'
+                message: 'Username already exists'
             });
         }
 
@@ -38,25 +62,26 @@ const registerUser = async (req, res) => {
         const user = await User.create({
             username,
             password,
-            role: role || 'user' // Default to 'user' if role not specified
+            role: 'user' // Always create regular users through registration
         });
 
-        if (user) {
-            res.status(201).json({
-                success: true,
-                user: {
-                    id: user._id,
-                    username: user.username,
-                    role: user.role
-                },
-                token: generateToken(user._id)
-            });
-        }
+        // Generate token and send response
+        const token = generateToken(user._id);
+
+        res.status(201).json({
+            success: true,
+            user: {
+                id: user._id,
+                username: user.username,
+                role: user.role
+            },
+            token
+        });
     } catch (error) {
+        console.error('Registration error:', error);
         res.status(500).json({
             success: false,
-            message: 'Server Error',
-            error: error.message
+            message: 'Registration failed. Please try again.'
         });
     }
 };

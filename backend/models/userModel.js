@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Username is required'],
         unique: true,
-        trim: true
+        trim: true,
+        index: true
     },
     password: {
         type: String,
@@ -19,21 +20,35 @@ const userSchema = new mongoose.Schema({
         default: 'user'
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    // Remove all existing indexes and create new ones
+    autoIndex: true
 });
+
+// Ensure indexes are set up correctly
+userSchema.index({ username: 1 }, { unique: true });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) {
-        return next();
+    try {
+        if (!this.isModified('password')) {
+            return next();
+        }
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
     }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Method to compare password for login
 userSchema.methods.matchPassword = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+    try {
+        return await bcrypt.compare(enteredPassword, this.password);
+    } catch (error) {
+        throw new Error('Error comparing passwords');
+    }
 };
 
 const User = mongoose.model('User', userSchema);
