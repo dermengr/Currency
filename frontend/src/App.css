@@ -1,17 +1,10 @@
 /* General styles */
 body {
   margin: 0;
-  padding: 0;
+  padding-top: 76px; /* Added to account for fixed navbar height */
   background-color: #ffffff; /* Updated to a cleaner white background */
   font-family: 'SF Pro Display', sans-serif; /* Added Apple-style font */
 }
-
-/* Container spacing */
-.container {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 
 /* Container spacing */
 .container {

@@ -1,35 +1,72 @@
-// currencyController.js - Currency pair management and conversion controller
-/*
- * EDUCATIONAL NOTES FOR JUNIOR DEVELOPERS
+/**
+ * @fileoverview Currency Operations Controller
  * 
- * This controller demonstrates important backend development concepts:
- * 1. RESTful API design with Express.js
- * 2. MongoDB operations using Mongoose
- * 3. CRUD operations implementation (Create, Read, Update, Delete)
- * 4. Input validation and error handling
- * 5. Authentication and authorization checks
- * 6. Business logic separation (currency conversion)
- * 7. Proper HTTP status code usage
- * 8. Consistent response formatting
+ * This controller manages currency pair operations and conversions.
+ * It serves as a comprehensive example of REST API implementation:
+ * 
+ * Key Concepts:
+ * 1. RESTful Architecture
+ *    - Resource-based routing
+ *    - HTTP method semantics
+ *    - Status code usage
+ *    - Response formatting
+ * 
+ * 2. Database Operations
+ *    - CRUD implementation
+ *    - Mongoose queries
+ *    - Data validation
+ *    - Error handling
+ * 
+ * 3. Business Logic
+ *    - Currency conversion
+ *    - Rate management
+ *    - Data normalization
+ * 
+ * 4. Security
+ *    - Input validation
+ *    - Role-based access
+ *    - Error sanitization
+ * 
+ * 5. Best Practices
+ *    - Async/await patterns
+ *    - Error handling
+ *    - Response consistency
+ *    - Code organization
+ * 
+ * Learning Points:
+ * - API design patterns
+ * - Database interaction
+ * - Error management
+ * - Business logic separation
  */
 
-const { validationResult } = require('express-validator'); // For input validation
-const CurrencyPair = require('../models/currencyPairModel'); // Mongoose model import
+const { validationResult } = require('express-validator');
+const CurrencyPair = require('../models/currencyPairModel');
 
 /**
- * Get all currency pairs
+ * Currency Pairs List Controller
+ * Retrieves all available currency pairs
+ * 
+ * Implementation Features:
+ * 1. Database Query
+ *    - Mongoose find operation
+ *    - Result sorting
+ *    - Query optimization
+ * 
+ * 2. Response Handling
+ *    - Success response structure
+ *    - Error handling
+ *    - Status codes
+ * 
+ * 3. Performance
+ *    - Query optimization
+ *    - Response formatting
+ *    - Error boundaries
+ * 
  * @route GET /api/currency
  * @access Public
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Object} List of all currency pairs
- * 
- * EDUCATIONAL NOTE: This demonstrates a simple READ operation with:
- * 1. Async/await for clean promise handling
- * 2. Try/catch for error handling
- * 3. MongoDB's find() and sort() operations
- * 4. Consistent response structure
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const getCurrencyPairs = async (req, res) => {
     try {
@@ -52,21 +89,29 @@ const getCurrencyPairs = async (req, res) => {
 };
 
 /**
- * Create new currency pair
+ * Currency Pair Creation Controller
+ * Creates a new currency pair with exchange rate
+ * 
+ * Implementation Features:
+ * 1. Input Processing
+ *    - Validation with express-validator
+ *    - Data normalization
+ *    - Duplicate checking
+ * 
+ * 2. Database Operation
+ *    - Document creation
+ *    - Error handling
+ *    - Success confirmation
+ * 
+ * 3. Security
+ *    - Admin-only access
+ *    - Input sanitization
+ *    - Error handling
+ * 
  * @route POST /api/currency
  * @access Private/Admin
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Object} Created currency pair data
- * @throws {Error} If validation fails or pair already exists
- * 
- * EDUCATIONAL NOTE: This demonstrates a CREATE operation with:
- * 1. Input validation using express-validator
- * 2. Business logic for checking duplicates
- * 3. Data normalization (toUpperCase)
- * 4. Proper status codes (201 for resource creation)
- * 5. Error handling with appropriate messages
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const createCurrencyPair = async (req, res) => {
     try {
@@ -119,15 +164,29 @@ const createCurrencyPair = async (req, res) => {
 };
 
 /**
- * Update currency pair
+ * Currency Pair Update Controller
+ * Updates an existing currency pair's information
+ * 
+ * Implementation Features:
+ * 1. Resource Location
+ *    - ID parameter handling
+ *    - Existence verification
+ *    - 404 handling
+ * 
+ * 2. Update Process
+ *    - Partial updates
+ *    - Data validation
+ *    - Save operation
+ * 
+ * 3. Response Handling
+ *    - Success confirmation
+ *    - Error scenarios
+ *    - Status codes
+ * 
  * @route PUT /api/currency/:id
  * @access Private/Admin
- * 
- * EDUCATIONAL NOTE: This demonstrates an UPDATE operation with:
- * 1. Route parameter usage (req.params.id)
- * 2. Conditional property updates
- * 3. Mongoose's findById and save methods
- * 4. 404 handling for resources that don't exist
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const updateCurrencyPair = async (req, res) => {
     try {
@@ -180,14 +239,29 @@ const updateCurrencyPair = async (req, res) => {
 };
 
 /**
- * Delete currency pair
+ * Currency Pair Deletion Controller
+ * Removes a currency pair from the system
+ * 
+ * Implementation Features:
+ * 1. Resource Verification
+ *    - Existence check
+ *    - Authorization check
+ *    - Cascade considerations
+ * 
+ * 2. Deletion Process
+ *    - Safe deletion
+ *    - Database cleanup
+ *    - Reference handling
+ * 
+ * 3. Response Handling
+ *    - Success confirmation
+ *    - Not found scenarios
+ *    - Error handling
+ * 
  * @route DELETE /api/currency/:id
  * @access Private/Admin
- * 
- * EDUCATIONAL NOTE: This demonstrates a DELETE operation with:
- * 1. Resource existence check before deletion
- * 2. Mongoose's deleteOne method
- * 3. Appropriate success message response
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const deleteCurrencyPair = async (req, res) => {
     try {
@@ -220,15 +294,29 @@ const deleteCurrencyPair = async (req, res) => {
 };
 
 /**
- * Convert amount between currencies
+ * Currency Conversion Controller
+ * Performs currency conversion calculations
+ * 
+ * Implementation Features:
+ * 1. Input Processing
+ *    - Amount validation
+ *    - Currency code verification
+ *    - Rate retrieval
+ * 
+ * 2. Business Logic
+ *    - Conversion calculation
+ *    - Rate application
+ *    - Result formatting
+ * 
+ * 3. Response Handling
+ *    - Detailed conversion info
+ *    - Error scenarios
+ *    - Rate information
+ * 
  * @route POST /api/currency/convert
  * @access Public
- * 
- * EDUCATIONAL NOTE: This demonstrates business logic implementation with:
- * 1. Input validation (amount > 0)
- * 2. Resource lookup by multiple criteria
- * 3. Using model methods for business logic (convert)
- * 4. Structured response with calculated results
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const convertCurrency = async (req, res) => {
     try {

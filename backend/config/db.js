@@ -1,27 +1,80 @@
-// db.js - Database connection configuration
-// This file handles the MongoDB connection setup using Mongoose
-// It also includes index management for database optimization
+/**
+ * @fileoverview Database Configuration Module
+ * 
+ * This module handles MongoDB connection setup and management.
+ * It demonstrates several important database concepts:
+ * 
+ * Key Concepts:
+ * 1. Database Connection
+ *    - MongoDB connection string handling
+ *    - Mongoose configuration
+ *    - Connection lifecycle management
+ * 
+ * 2. Index Management
+ *    - Database optimization
+ *    - Index cleanup
+ *    - Collection management
+ * 
+ * 3. Error Handling
+ *    - Connection error management
+ *    - Graceful error recovery
+ *    - Application termination
+ * 
+ * 4. Security
+ *    - Environment-based configuration
+ *    - Secure connection handling
+ *    - Error information sanitization
+ * 
+ * Learning Points:
+ * - Understanding MongoDB connection process
+ * - Database index management
+ * - Error handling patterns
+ * - Application lifecycle management
+ */
 
-const mongoose = require('mongoose');  // MongoDB object modeling tool
+const mongoose = require('mongoose');  // MongoDB ODM library
 
 /**
- * connectDB - Establishes connection to MongoDB database
+ * Database Connection Function
+ * Establishes and manages MongoDB connection
  * 
- * This function:
- * 1. Connects to MongoDB using the URI from environment variables
- * 2. Handles potential index issues by dropping problematic indexes
- * 3. Logs connection status or errors
- * 4. Terminates the application on connection failure
+ * Features:
+ * 1. Asynchronous Connection
+ *    - Promise-based connection handling
+ *    - Proper error management
  * 
- * @returns {Promise<void>} - Resolves when connection is established
+ * 2. Index Management
+ *    - Automatic index cleanup
+ *    - Collection verification
+ *    - Safe index dropping
+ * 
+ * 3. Logging
+ *    - Connection status logging
+ *    - Error reporting
+ *    - Debug information
+ * 
+ * @async
+ * @function connectDB
+ * @returns {Promise<void>} Resolves when connection is established
+ * @throws {Error} Connection or configuration errors
  */
 const connectDB = async () => {
     try {
-        // Establish connection to MongoDB using the URI from environment variables
+        /**
+         * MongoDB Connection
+         * Connect to database using environment configuration
+         */
         const conn = await mongoose.connect(process.env.MONGO_URI);
         
-        // Index management - Drop potentially problematic index if it exists
-        // This handles a specific case where an old email index might cause issues
+        /**
+         * Index Management
+         * Handle database optimization and cleanup
+         * 
+         * Steps:
+         * 1. Get all collections
+         * 2. Find users collection
+         * 3. Drop legacy email index
+         */
         try {
             const collections = await conn.connection.db.collections();
             const usersCollection = collections.find(c => c.collectionName === 'users');
@@ -34,12 +87,19 @@ const connectDB = async () => {
             console.log('No old index to drop');
         }
 
-        // Log successful connection with the host information
+        // Log successful connection
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
-        // Handle connection errors by logging and terminating the application
+        /**
+         * Error Handling
+         * Handle connection failures gracefully
+         * 
+         * 1. Log error details
+         * 2. Terminate application (critical failure)
+         * 3. Use appropriate exit code
+         */
         console.error(`Error: ${error.message}`);
-        process.exit(1);  // Exit with failure code
+        process.exit(1);
     }
 };
 

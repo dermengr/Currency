@@ -1,22 +1,63 @@
-// authMiddleware.js - Authentication middleware for route protection
-// This middleware verifies JWT tokens and manages route access control
-// Key features:
-// 1. Token extraction and verification
-// 2. User authentication
-// 3. Route protection
-// 4. Error handling
+/**
+ * @fileoverview Authentication Middleware
+ * 
+ * This module provides authentication and authorization middleware.
+ * It demonstrates several important security concepts:
+ * 
+ * Key Concepts:
+ * 1. JWT Authentication
+ *    - Token verification
+ *    - User identification
+ *    - Session management
+ * 
+ * 2. Authorization
+ *    - Role-based access
+ *    - Route protection
+ *    - Permission checking
+ * 
+ * 3. Security
+ *    - Token extraction
+ *    - Error handling
+ *    - User validation
+ * 
+ * 4. Middleware Pattern
+ *    - Request processing
+ *    - Response handling
+ *    - Next function usage
+ * 
+ * Learning Points:
+ * - JWT implementation
+ * - Middleware architecture
+ * - Security best practices
+ * - Error management
+ */
 
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 /**
- * Protect routes - Middleware to verify JWT token and authenticate users
- * Used to restrict access to protected routes
+ * Route Protection Middleware
+ * Verifies JWT tokens and authenticates users
  * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {void}
+ * Features:
+ * 1. Token Processing
+ *    - Header extraction
+ *    - Bearer scheme handling
+ *    - Token validation
+ * 
+ * 2. User Authentication
+ *    - Token decoding
+ *    - User lookup
+ *    - Session validation
+ * 
+ * 3. Security
+ *    - Error boundaries
+ *    - Password exclusion
+ *    - Token verification
+ * 
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next middleware
  */
 const protect = async (req, res, next) => {
     try {
@@ -65,7 +106,30 @@ const protect = async (req, res, next) => {
 
 module.exports = { protect };
 
-// Admin middleware
+/**
+ * Admin Authorization Middleware
+ * Verifies user has admin privileges
+ * 
+ * Features:
+ * 1. Role Verification
+ *    - Admin role check
+ *    - Permission validation
+ *    - Access control
+ * 
+ * 2. Security
+ *    - Role-based auth
+ *    - Unauthorized handling
+ *    - Error responses
+ * 
+ * 3. Flow Control
+ *    - Middleware chaining
+ *    - Request filtering
+ *    - Response handling
+ * 
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next middleware
+ */
 const admin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next();

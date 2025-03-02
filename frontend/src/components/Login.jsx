@@ -1,29 +1,63 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './Login.css'; // Added import for custom styles
-import { gsap } from 'gsap'; // Import GSAP
+/**
+ * @fileoverview Login Component
+ * 
+ * This component handles user authentication (login and registration).
+ * It demonstrates several advanced React concepts and features:
+ * 
+ * Key Concepts:
+ * 1. Form handling in React
+ * 2. Multiple state management with useState
+ * 3. Side effects with useEffect
+ * 4. Refs for DOM manipulation
+ * 5. GSAP animations
+ * 6. Error handling
+ * 7. Conditional rendering
+ * 8. Authentication flow
+ */
 
+import React, { useState, useEffect, useRef } from 'react';
+import './Login.css';
+import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 
+/**
+ * Login Component
+ * Handles both login and registration functionality with animated transitions
+ * 
+ * @component
+ * @example
+ * return (
+ *   <Login />
+ * )
+ */
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [isRegistering, setIsRegistering] = useState(false);
+    // Form input states
+    const [username, setUsername] = useState('');  // Username input
+    const [password, setPassword] = useState('');  // Password input
+    const [confirmPassword, setConfirmPassword] = useState('');  // Confirm password for registration
     
-    const { login } = useAuth();
-    const navigate = useNavigate();
+    // UI states
+    const [error, setError] = useState('');  // Error message display
+    const [loading, setLoading] = useState(false);  // Loading state for submit button
+    const [isRegistering, setIsRegistering] = useState(false);  // Toggle between login/register modes
+    
+    // Hooks for authentication and navigation
+    const { login } = useAuth();  // Authentication context
+    const navigate = useNavigate();  // Programmatic navigation
 
-    // Refs for GSAP animations
+    // Refs for GSAP animations - allows direct DOM manipulation
     const cardRef = useRef(null);
     const formRef = useRef(null);
     const titleRef = useRef(null);
     const buttonRef = useRef(null);
 
-    // Initialize animations when component mounts
+    /**
+     * Animation Effect
+     * Initializes and runs animations when component mounts or mode changes
+     * Demonstrates complex animation sequences with GSAP
+     */
     useEffect(() => {
         // Card entrance animation
         gsap.fromTo(cardRef.current,
@@ -50,6 +84,12 @@ const Login = () => {
         );
     }, [isRegistering]); // Re-run animations when switching between login/register
 
+    /**
+     * Form Validation
+     * Checks form inputs against business rules
+     * 
+     * @returns {boolean} Whether the form is valid
+     */
     const validateForm = () => {
         if (!username || username.length < 3) {
             setError('Username must be at least 3 characters long');
@@ -66,6 +106,13 @@ const Login = () => {
         return true;
     };
 
+    /**
+     * Form Submission Handler
+     * Processes form submission for both login and registration
+     * Demonstrates async/await pattern and error handling
+     * 
+     * @param {Event} e - Form submission event
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -123,6 +170,11 @@ const Login = () => {
         }
     };
 
+    /**
+     * Mode Toggle Handler
+     * Switches between login and registration modes with animations
+     * Demonstrates state management with animations
+     */
     const toggleMode = () => {
         // Animate out current form
         gsap.to(formRef.current.children, {

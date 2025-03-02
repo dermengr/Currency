@@ -1,23 +1,69 @@
-// currencyPairModel.js - Currency pair schema and conversion methods
-// This file defines the data model for currency pairs and includes conversion functionality
-// Key features:
-// 1. Currency pair schema with validation
-// 2. Automatic currency code formatting
-// 3. Exchange rate validation
-// 4. Conversion calculations
-// 5. Timestamp management
+/**
+ * @fileoverview Currency Pair Model Definition
+ * 
+ * This module defines the currency pair data model and conversion methods.
+ * It demonstrates several important data modeling concepts:
+ * 
+ * Key Concepts:
+ * 1. Schema Design
+ *    - Field definitions
+ *    - Data validation
+ *    - Compound indexes
+ *    - Timestamps
+ * 
+ * 2. Business Logic
+ *    - Currency conversion
+ *    - Rate management
+ *    - Update tracking
+ * 
+ * 3. Data Integrity
+ *    - Field validation
+ *    - Format standardization
+ *    - Uniqueness constraints
+ * 
+ * 4. Performance
+ *    - Index optimization
+ *    - Efficient queries
+ *    - Data normalization
+ * 
+ * Learning Points:
+ * - MongoDB schema design
+ * - Business logic implementation
+ * - Data validation patterns
+ * - Performance optimization
+ */
 
-const mongoose = require('mongoose');  // MongoDB object modeling tool
+const mongoose = require('mongoose');
 
 /**
- * Currency Pair Schema Definition
- * Defines the structure and validation rules for currency pair documents
+ * Currency Pair Schema
+ * Defines the structure and behavior of currency pair documents
  * 
  * Fields:
- * - baseCurrency: Source currency code (e.g., USD)
- * - targetCurrency: Destination currency code (e.g., EUR)
- * - rate: Exchange rate between the currencies
- * - lastUpdated: Timestamp of last rate update
+ * 1. Base Currency
+ *    - Source currency code
+ *    - Required field
+ *    - Uppercase formatting
+ * 
+ * 2. Target Currency
+ *    - Destination currency code
+ *    - Required field
+ *    - Uppercase formatting
+ * 
+ * 3. Exchange Rate
+ *    - Numeric value
+ *    - Positive validation
+ *    - Required field
+ * 
+ * 4. Last Updated
+ *    - Timestamp tracking
+ *    - Automatic updates
+ *    - Change monitoring
+ * 
+ * Features:
+ * - Automatic timestamps
+ * - Compound indexing
+ * - Data normalization
  */
 const currencyPairSchema = new mongoose.Schema({
     baseCurrency: {
@@ -54,11 +100,27 @@ const currencyPairSchema = new mongoose.Schema({
 
 /**
  * Currency Conversion Method
- * Calculates converted amount based on exchange rate
+ * Instance method for performing currency conversions
+ * 
+ * Features:
+ * 1. Calculation
+ *    - Precise decimal handling
+ *    - Rounding rules
+ *    - Rate application
+ * 
+ * 2. Validation
+ *    - Input verification
+ *    - Range checking
+ *    - Error handling
+ * 
+ * 3. Formatting
+ *    - Decimal precision
+ *    - Number formatting
+ *    - Output standardization
  * 
  * @param {number} amount - Amount to convert
- * @returns {number} - Converted amount rounded to 2 decimal places
- * @throws {Error} - If amount is invalid
+ * @returns {number} Converted amount
+ * @throws {Error} Invalid input error
  */
 currencyPairSchema.methods.convert = function(amount) {
     if (!amount || isNaN(amount) || amount < 0) {
@@ -70,8 +132,23 @@ currencyPairSchema.methods.convert = function(amount) {
 
 /**
  * Rate Update Middleware
- * Updates lastUpdated timestamp when exchange rate changes
- * Runs before saving document if rate field is modified
+ * Pre-save hook for rate change tracking
+ * 
+ * Features:
+ * 1. Change Detection
+ *    - Rate modification check
+ *    - Timestamp updates
+ *    - Audit tracking
+ * 
+ * 2. Performance
+ *    - Conditional execution
+ *    - Efficient updates
+ *    - Minimal overhead
+ * 
+ * 3. Data Integrity
+ *    - Consistent timestamps
+ *    - Change history
+ *    - Update tracking
  */
 currencyPairSchema.pre('save', function(next) {
     if (this.isModified('rate')) {

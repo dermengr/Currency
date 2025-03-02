@@ -4,18 +4,56 @@ import currencyService from '../services/currencyService';
 import './AdminDashboard.css'; // Added import for custom styles
 import { gsap } from 'gsap'; // Import GSAP
 
-/*
- * EDUCATIONAL NOTES FOR JUNIOR DEVELOPERS
+/**
+ * @fileoverview Admin Dashboard Component
  * 
- * This component demonstrates several important React concepts:
- * 1. Functional components with hooks (useState, useEffect, useRef, custom hooks)
- * 2. API integration with async/await pattern
- * 3. CRUD operations (Create, Read, Update, Delete)
- * 4. Form handling with controlled components
- * 5. Animation using GSAP library
- * 6. Modal implementation
- * 7. Error handling patterns
- * 8. Custom event dispatching for cross-component communication
+ * This component serves as a comprehensive example of modern React development practices.
+ * It's designed to be educational for junior developers, demonstrating various concepts
+ * and patterns commonly used in professional React applications.
+ * 
+ * Key Learning Concepts:
+ * 
+ * 1. React Fundamentals
+ *    - Functional Components
+ *    - Hook Usage (useState, useEffect, useRef, custom hooks)
+ *    - Component Lifecycle Management
+ *    - JSX Patterns and Best Practices
+ * 
+ * 2. State Management
+ *    - Complex State Organization
+ *    - Form State Handling
+ *    - Modal State Control
+ *    - Loading States
+ * 
+ * 3. API Integration
+ *    - Async/Await Pattern
+ *    - CRUD Operations
+ *    - Error Handling
+ *    - Loading States
+ * 
+ * 4. User Interface
+ *    - Form Handling with Controlled Components
+ *    - Modal Implementation
+ *    - Responsive Design with Bootstrap
+ *    - Animation using GSAP
+ * 
+ * 5. Advanced Patterns
+ *    - Custom Event Dispatching
+ *    - Ref Usage for DOM Manipulation
+ *    - Conditional Rendering
+ *    - List Rendering with Keys
+ * 
+ * 6. Performance Considerations
+ *    - Optimized Animations
+ *    - Proper Cleanup in useEffect
+ *    - Efficient State Updates
+ *    - Memory Leak Prevention
+ * 
+ * @component
+ * @example
+ * return (
+ *   <AdminDashboard />
+ * )
  */
 
 const AdminDashboard = () => {

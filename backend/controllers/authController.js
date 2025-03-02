@@ -1,21 +1,52 @@
-// authController.js - Authentication and user management controller
-// This controller handles user registration, login, and profile management
-// Key features:
-// 1. User registration with validation
-// 2. Secure login with JWT
-// 3. Password validation
-// 4. Profile management
-// 5. Error handling
+/**
+ * @fileoverview Authentication Controller
+ * 
+ * This controller manages user authentication and profile operations.
+ * It demonstrates several important backend concepts:
+ * 
+ * Key Concepts:
+ * 1. Authentication Flow
+ *    - User registration
+ *    - Login process
+ *    - JWT token management
+ * 
+ * 2. Security
+ *    - Password handling
+ *    - Input validation
+ *    - Token generation
+ * 
+ * 3. Database Operations
+ *    - User creation
+ *    - User queries
+ *    - Data validation
+ * 
+ * 4. API Design
+ *    - RESTful endpoints
+ *    - Response formatting
+ *    - Error handling
+ * 
+ * Learning Points:
+ * - Authentication patterns
+ * - Security best practices
+ * - Controller organization
+ * - Error management
+ */
 
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/userModel');
 
 /**
- * Generates a JWT token for user authentication
+ * JWT Token Generator
+ * Creates a signed JWT token for user authentication
  * 
- * @param {string} id - User ID to encode in the token
- * @returns {string} JWT token valid for 30 days
+ * Features:
+ * 1. Secure signing with secret key
+ * 2. Token expiration
+ * 3. User ID encoding
+ * 
+ * @param {string} id - User ID to encode
+ * @returns {string} Signed JWT token
  */
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -24,14 +55,29 @@ const generateToken = (id) => {
 };
 
 /**
- * Register a new user
+ * User Registration Controller
+ * Handles new user registration process
+ * 
+ * Features:
+ * 1. Input Validation
+ *    - Username requirements
+ *    - Password strength
+ *    - Duplicate checking
+ * 
+ * 2. Security
+ *    - Password hashing (in model)
+ *    - Role assignment
+ *    - Token generation
+ * 
+ * 3. Response Handling
+ *    - Success response
+ *    - Validation errors
+ *    - Server errors
+ * 
  * @route POST /api/auth/register
  * @access Public
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Object} User data and authentication token
- * @throws {Error} If registration fails
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  */
 const registerUser = async (req, res) => {
     try {
@@ -107,9 +153,31 @@ const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+/**
+ * User Login Controller
+ * Authenticates users and provides access tokens
+ * 
+ * Features:
+ * 1. Authentication
+ *    - Username/password validation
+ *    - Password comparison
+ *    - Token generation
+ * 
+ * 2. Security
+ *    - Error message sanitization
+ *    - Failed attempt handling
+ *    - Session management
+ * 
+ * 3. Response
+ *    - User data
+ *    - Authentication token
+ *    - Error handling
+ * 
+ * @route POST /api/auth/login
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 const loginUser = async (req, res) => {
     try {
         // Validate request
@@ -152,9 +220,30 @@ const loginUser = async (req, res) => {
     }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/profile
-// @access  Private
+/**
+ * User Profile Controller
+ * Retrieves authenticated user's profile
+ * 
+ * Features:
+ * 1. Authentication
+ *    - Token verification (in middleware)
+ *    - User identification
+ * 
+ * 2. Data Handling
+ *    - Password exclusion
+ *    - Data formatting
+ *    - Not found handling
+ * 
+ * 3. Security
+ *    - Private route protection
+ *    - Data sanitization
+ *    - Error handling
+ * 
+ * @route GET /api/auth/profile
+ * @access Private
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select('-password');

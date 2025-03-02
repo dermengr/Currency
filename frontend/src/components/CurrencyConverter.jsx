@@ -1,49 +1,77 @@
-// CurrencyConverter.jsx - Main component for currency conversion functionality
-// This component implements a user-friendly interface for converting between currencies
-// Key features:
-// 1. Real-time exchange rate updates
-// 2. Dynamic currency pair selection
-// 3. Automatic rate refresh
-// 4. Error handling and validation
-// 5. Loading state management
-// 6. Responsive design
+/**
+ * @fileoverview Currency Converter Component
+ * 
+ * This component implements a full-featured currency conversion interface.
+ * It demonstrates several advanced React patterns and best practices:
+ * 
+ * Key Concepts:
+ * 1. Complex State Management
+ *    - Multiple useState hooks for different aspects of the application
+ *    - State dependencies and relationships
+ * 
+ * 2. Side Effects and Lifecycle
+ *    - useEffect for data fetching
+ *    - Cleanup and memory management
+ *    - Event listener handling
+ * 
+ * 3. Real-time Updates
+ *    - Polling mechanism for rate updates
+ *    - Visibility state handling
+ *    - Event-based updates
+ * 
+ * 4. Animation Integration
+ *    - GSAP for smooth animations
+ *    - ScrollTrigger for scroll-based animations
+ *    - Conditional animation triggers
+ * 
+ * 5. Error Handling
+ *    - Comprehensive error states
+ *    - User feedback
+ *    - Graceful degradation
+ * 
+ * 6. Performance Optimization
+ *    - Debounced updates
+ *    - Conditional rendering
+ *    - Efficient re-renders
+ */
 
 import React, { useState, useEffect } from 'react';
-import './CurrencyConverter.css'; // Custom styles for the component
-import { ScrollTrigger } from 'gsap/ScrollTrigger'; // Import ScrollTrigger
-import { gsap } from 'gsap'; // Import GSAP
-gsap.registerPlugin(ScrollTrigger); // Register ScrollTrigger
+import './CurrencyConverter.css';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap } from 'gsap';
+gsap.registerPlugin(ScrollTrigger);
 
-import currencyService from '../services/currencyService';  // API service for currency operations
-import { useAuth } from '../context/AuthContext';  // Authentication context
+import currencyService from '../services/currencyService';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * CurrencyConverter Component
- * Provides the main currency conversion interface and functionality
  * 
- * Features:
- * - Real-time currency conversion
- * - Dynamic currency pair selection
- * - Rate updates every 30 seconds
- * - Error handling and validation
- * - Loading state indicators
+ * A comprehensive currency conversion interface with real-time updates,
+ * animations, and error handling.
  * 
- * @returns {React.ReactNode} Currency converter interface
+ * @component
+ * @example
+ * return (
+ *   <CurrencyConverter />
+ * )
  */
 const CurrencyConverter = () => {
-    // State Management
-    const [amount, setAmount] = useState('');              // Amount to convert
-    const [fromCurrency, setFromCurrency] = useState('');  // Source currency
-    const [toCurrency, setToCurrency] = useState('');      // Target currency
-    const [result, setResult] = useState(null);            // Conversion result
-    const [error, setError] = useState('');                // Error messages
-    const [loading, setLoading] = useState(false);         // Loading state
-    const [currencyPairs, setCurrencyPairs] = useState([]); // Available pairs
+    // Form State - Manages user input and selection
+    const [amount, setAmount] = useState('');              // User input amount
+    const [fromCurrency, setFromCurrency] = useState('');  // Source currency code
+    const [toCurrency, setToCurrency] = useState('');      // Target currency code
+    
+    // Application State - Manages application behavior
+    const [result, setResult] = useState(null);            // Conversion result object
+    const [error, setError] = useState('');                // Error message state
+    const [loading, setLoading] = useState(false);         // Loading indicator
+    const [currencyPairs, setCurrencyPairs] = useState([]); // Available currency pairs
+    
+    // Authentication Context - User authentication state
+    const { token } = useAuth();
 
-    // Authentication
-    const { token } = useAuth();  // Get auth token from context
-
-    // GSAP animations reference
+    // Animation Refs - DOM references for GSAP animations
     const cardRef = React.useRef(null);
     const formRef = React.useRef(null);
     const resultRef = React.useRef(null);
@@ -51,8 +79,16 @@ const CurrencyConverter = () => {
     const inputsRef = React.useRef(null);
     const buttonRef = React.useRef(null);
 
+    /**
+     * Currency Pairs Initialization Effect
+     * 
+     * This effect handles:
+     * 1. Initial data fetching
+     * 2. Real-time updates
+     * 3. Visibility change handling
+     * 4. Cleanup and memory management
+     */
     useEffect(() => {
-        // Function to fetch and initialize available currency pairs
         const initializeCurrencyPairs = async () => {
             if (!token) {
                 setError('Please log in to use the currency converter');
@@ -102,7 +138,18 @@ const CurrencyConverter = () => {
     }, [fromCurrency, toCurrency, token]); // Dependencies for useEffect
 
 
-    // Handler for currency conversion
+    /**
+     * Currency Conversion Handler
+     * 
+     * Processes the currency conversion request with proper error handling:
+     * 1. Input validation and authentication check
+     * 2. API request with error boundaries
+     * 3. Result state management
+     * 4. Loading state handling
+     * 
+     * @async
+     * @function
+     */
     const handleConvert = async () => {
         setError('');
         setResult(null);
@@ -139,7 +186,15 @@ const CurrencyConverter = () => {
         }
     };
 
-    // Handler to swap between currencies
+    /**
+     * Currency Swap Handler
+     * 
+     * Handles the currency pair swap operation:
+     * 1. Validates if reverse pair exists
+     * 2. Updates currency states
+     * 3. Resets result state
+     * 4. Provides error feedback
+     */
     const handleSwap = () => {
         // Verify if the reverse currency pair exists
         const reversePairExists = currencyPairs.some(
@@ -155,7 +210,17 @@ const CurrencyConverter = () => {
         }
     };
 
-    // Helper function to get valid currency pairs
+    /**
+     * Currency Pair Validator
+     * 
+     * Utility function that:
+     * 1. Extracts unique base currencies
+     * 2. Maps valid target currencies for each base
+     * 3. Ensures currency pair validity
+     * 4. Maintains sorted order for UI consistency
+     * 
+     * @returns {Object} Object containing fromCurrencies array and getValidToCurrencies function
+     */
     const getValidPairs = () => {
         // Get unique base currencies
         const fromCurrencies = [...new Set(currencyPairs.map(pair => pair.baseCurrency))].sort();
@@ -169,7 +234,19 @@ const CurrencyConverter = () => {
         return { fromCurrencies, getValidToCurrencies };
     };
 
-    // Initialize GSAP animations
+    /**
+     * Animation Initialization Effect
+     * 
+     * Sets up GSAP animations for enhanced user experience:
+     * 1. Card entrance animation with scroll trigger
+     * 2. Form elements stagger animation
+     * 3. Proper cleanup of animation triggers
+     * 
+     * Uses ScrollTrigger for scroll-based animations:
+     * - Triggers when element enters viewport
+     * - Reverses on scroll up
+     * - Proper memory management
+     */
     useEffect(() => {
         // Card entrance animation
         gsap.fromTo(cardRef.current,
@@ -210,7 +287,16 @@ const CurrencyConverter = () => {
         };
     }, []); // Run once on mount
     
-    // Result animation effect
+    /**
+     * Result Display Animation Effect
+     * 
+     * Handles the animation of conversion results:
+     * 1. Triggers when new result is available
+     * 2. Scales and fades in the result
+     * 3. Uses GSAP for smooth transitions
+     * 
+     * @dependency {result} - Re-runs when result state changes
+     */
     useEffect(() => {
         if (result && resultRef.current) {
             gsap.fromTo(resultRef.current,
@@ -220,7 +306,18 @@ const CurrencyConverter = () => {
         }
     }, [result]);
     
-    // Component UI rendering
+    /**
+     * Component Render Method
+     * 
+     * Renders a responsive currency converter interface:
+     * 1. Bootstrap-based responsive grid
+     * 2. Form inputs with validation
+     * 3. Dynamic currency selection
+     * 4. Loading states and error handling
+     * 5. Animated result display
+     * 
+     * @returns {JSX.Element} The rendered currency converter interface
+     */
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">

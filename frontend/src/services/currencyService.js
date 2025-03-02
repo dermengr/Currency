@@ -1,16 +1,40 @@
-// currencyService.js - API service for currency operations
-// This service handles all currency-related API calls to the backend
-// Key features:
-// 1. Currency pair fetching
-// 2. Currency conversion
-// 3. Rate management (admin only)
-// 4. Error handling and validation
-// 5. Authentication token management
+/**
+ * @fileoverview Currency Service Module
+ * 
+ * This module handles all currency-related API operations.
+ * It demonstrates several advanced frontend development patterns:
+ * 
+ * Key Concepts:
+ * 1. API Integration
+ *    - RESTful endpoints
+ *    - Authentication headers
+ *    - Request/response handling
+ * 
+ * 2. Data Management
+ *    - Currency pair operations
+ *    - Conversion calculations
+ *    - Rate management
+ * 
+ * 3. Error Handling
+ *    - Input validation
+ *    - API error handling
+ *    - Consistent error formatting
+ * 
+ * 4. Security
+ *    - Token-based authentication
+ *    - Role-based access control
+ *    - Data validation
+ */
 
 import axios from 'axios';
 
+// Base URL for currency operations
 const API_URL = 'http://localhost:5000/api/currency';
 
+/**
+ * Currency Service Object
+ * Provides methods for currency operations and management
+ */
 const currencyService = {
     /**
      * Fetches all available currency pairs from the server
@@ -92,7 +116,24 @@ const currencyService = {
         }
     },
 
-    // Admin Operations
+    /**
+     * Admin Operations Section
+     * These methods are restricted to admin users only
+     */
+
+    /**
+     * Create Currency Pair
+     * Creates a new currency pair with exchange rate
+     * 
+     * @async
+     * @param {Object} pairData - Currency pair information
+     * @param {string} pairData.baseCurrency - Base currency code
+     * @param {string} pairData.targetCurrency - Target currency code
+     * @param {number} pairData.rate - Exchange rate
+     * @param {string} token - Admin authentication token
+     * @returns {Promise<Object>} Created currency pair data
+     * @throws {Error} Creation failure with error message
+     */
     createPair: async (pairData, token) => {
         try {
             const response = await axios.post(API_URL, pairData, {
@@ -106,6 +147,17 @@ const currencyService = {
         }
     },
 
+    /**
+     * Update Currency Pair
+     * Updates an existing currency pair's information
+     * 
+     * @async
+     * @param {string} id - Currency pair ID
+     * @param {Object} pairData - Updated pair information
+     * @param {string} token - Admin authentication token
+     * @returns {Promise<Object>} Updated currency pair data
+     * @throws {Error} Update failure with error message
+     */
     updatePair: async (id, pairData, token) => {
         try {
             const response = await axios.put(`${API_URL}/${id}`, pairData, {
@@ -119,6 +171,16 @@ const currencyService = {
         }
     },
 
+    /**
+     * Delete Currency Pair
+     * Removes a currency pair from the system
+     * 
+     * @async
+     * @param {string} id - Currency pair ID to delete
+     * @param {string} token - Admin authentication token
+     * @returns {Promise<Object>} Deletion confirmation
+     * @throws {Error} Deletion failure with error message
+     */
     deletePair: async (id, token) => {
         try {
             const response = await axios.delete(`${API_URL}/${id}`, {

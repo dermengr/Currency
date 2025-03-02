@@ -1,51 +1,118 @@
-// server.js - Main entry point for the Currency Converter API
-// This file sets up the Express server, configures middleware, and defines routes
-// Key features:
-// 1. Environment configuration
-// 2. Database connection
-// 3. Middleware setup (CORS, body parsing)
-// 4. Route definitions
-// 5. Error handling
-// 6. Server initialization
+/**
+ * @fileoverview Express Server Entry Point
+ * 
+ * This is the main server file for the Currency Converter API.
+ * It demonstrates several important backend development concepts:
+ * 
+ * Key Concepts:
+ * 1. Server Setup
+ *    - Express application configuration
+ *    - Environment management
+ *    - Server lifecycle
+ * 
+ * 2. Middleware Architecture
+ *    - CORS handling
+ *    - Request parsing
+ *    - Error handling
+ *    - Route mounting
+ * 
+ * 3. Database Integration
+ *    - MongoDB connection
+ *    - Connection error handling
+ *    - Database configuration
+ * 
+ * 4. Security
+ *    - Environment variables
+ *    - CORS configuration
+ *    - Error sanitization
+ * 
+ * 5. Error Management
+ *    - Global error handling
+ *    - Promise rejection catching
+ *    - 404 handling
+ * 
+ * Learning Points:
+ * - Understanding Express.js architecture
+ * - Middleware pipeline concept
+ * - Environment-based configuration
+ * - Error handling patterns
+ * - API security basics
+ */
 
-const express = require('express');  // Web framework for Node.js
-const cors = require('cors');        // Enable Cross-Origin Resource Sharing
-const dotenv = require('dotenv');    // Load environment variables from .env file
-const connectDB = require('./config/db');  // Database connection utility
-const { errorHandler } = require('./utils/errorHandler');  // Global error handler
+// Core Dependencies
+const express = require('express');    // Express web framework
+const cors = require('cors');          // Cross-Origin Resource Sharing
+const dotenv = require('dotenv');      // Environment configuration
+const connectDB = require('./config/db');  // Database connection
+const { errorHandler } = require('./utils/errorHandler');  // Error handling
 
-// Load environment variables from .env file
-// This allows configuration of sensitive data (DB URI, JWT secret, etc.)
+/**
+ * Environment Configuration
+ * Load and validate environment variables early in the application lifecycle
+ * This ensures all required configuration is available before server starts
+ */
 dotenv.config();
 
-// Initialize database connection
-// Establishes MongoDB connection using mongoose
+/**
+ * Database Initialization
+ * Establish connection to MongoDB using Mongoose
+ * Connection is handled asynchronously with error handling
+ */
 connectDB();
 
-// Create Express application instance
+/**
+ * Express Application Instance
+ * Creates the main application object that will be configured with middleware
+ */
 const app = express();
 
-// Middleware Configuration
-// 1. CORS - Enables cross-origin requests (needed for frontend communication)
-// 2. express.json() - Parses incoming JSON payloads
-// 3. urlencoded - Parses URL-encoded bodies (form data)
+/**
+ * Middleware Configuration
+ * Sets up the processing pipeline for incoming requests
+ * 
+ * 1. CORS - Handles Cross-Origin Resource Sharing
+ *    Allows frontend to communicate with API
+ * 
+ * 2. Body Parsing
+ *    - JSON parsing for API requests
+ *    - URL-encoded data parsing for forms
+ *    - Size limits and security considerations
+ */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Route Definitions
-// Mount API routes at their respective endpoints
-// /api/auth - Authentication routes (login, register, etc.)
-// /api/currency - Currency operations (conversion, pair management)
+/**
+ * Route Definitions
+ * Mount modular route handlers at their respective endpoints
+ * 
+ * Routes:
+ * 1. /api/auth - Authentication operations
+ *    - Login
+ *    - Registration
+ *    - Profile management
+ * 
+ * 2. /api/currency - Currency operations
+ *    - Currency pair management
+ *    - Conversion calculations
+ *    - Rate updates
+ */
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/currency', require('./routes/currencyRoutes'));
 
-// Global Error Handler
-// Catches and formats all errors thrown in the application
-app.use(errorHandler);
-
-// 404 Handler - Catch undefined routes
-// Returns standardized response for non-existent endpoints
+/**
+ * Error Handling Configuration
+ * 
+ * 1. Global Error Handler
+ *    - Catches all errors thrown in routes
+ *    - Formats errors for consistent API responses
+ *    - Handles different error types appropriately
+ * 
+ * 2. 404 Handler
+ *    - Catches requests to undefined routes
+ *    - Returns standardized "not found" response
+ *    - Maintains API consistency
+ */
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
@@ -53,19 +120,34 @@ app.use('*', (req, res) => {
     });
 });
 
-// Server Configuration
-// Use environment-defined port or fallback to 5000
+/**
+ * Server Configuration and Startup
+ * 
+ * 1. Port Configuration
+ *    - Uses environment variable if available
+ *    - Falls back to default port 5000
+ * 
+ * 2. Server Initialization
+ *    - Starts HTTP server
+ *    - Logs startup information
+ *    - Indicates environment mode
+ */
 const PORT = process.env.PORT || 5000;
 
-// Start the server
-// Listen for incoming requests and log server status
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
 
-// Global Promise Rejection Handler
-// Catches any unhandled promise rejections and logs them
-// Forces application to exit on critical errors
+/**
+ * Global Error Handling
+ * 
+ * Catches unhandled promise rejections:
+ * 1. Logs error details for debugging
+ * 2. Terminates process for critical errors
+ * 3. Allows for graceful shutdown in production
+ * 
+ * This is a critical safety net for unexpected errors
+ */
 process.on('unhandledRejection', (err) => {
     console.log(`Error: ${err.message}`);
     // Close server & exit process with failure code

@@ -1,22 +1,65 @@
-// userModel.js - User schema and authentication methods
-// This file defines the user data model and includes password hashing functionality
-// Key features:
-// 1. User schema definition with validation
-// 2. Password hashing middleware
-// 3. Password comparison method
-// 4. Role-based access control
+/**
+ * @fileoverview User Model Definition
+ * 
+ * This module defines the user data model and authentication methods.
+ * It demonstrates several important MongoDB/Mongoose concepts:
+ * 
+ * Key Concepts:
+ * 1. Schema Design
+ *    - Field definitions
+ *    - Validation rules
+ *    - Indexes
+ *    - Timestamps
+ * 
+ * 2. Security
+ *    - Password hashing
+ *    - Role management
+ *    - Data validation
+ * 
+ * 3. Middleware
+ *    - Pre-save hooks
+ *    - Error handling
+ *    - Async operations
+ * 
+ * 4. Methods
+ *    - Instance methods
+ *    - Password comparison
+ *    - Authentication helpers
+ * 
+ * Learning Points:
+ * - MongoDB schema design
+ * - Password security
+ * - Mongoose middleware
+ * - Data validation
+ */
 
-const mongoose = require('mongoose');  // MongoDB object modeling tool
-const bcrypt = require('bcryptjs');    // Password hashing utility
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 /**
- * User Schema Definition
- * Defines the structure and validation rules for user documents
+ * User Schema
+ * Defines the structure and behavior of user documents
  * 
  * Fields:
- * - username: Unique identifier for the user
- * - password: Hashed password string
- * - role: User access level (user/admin)
+ * 1. Username
+ *    - Unique identifier
+ *    - Required field
+ *    - Indexed for performance
+ * 
+ * 2. Password
+ *    - Hashed storage
+ *    - Minimum length
+ *    - Required field
+ * 
+ * 3. Role
+ *    - Access control
+ *    - Enumerated values
+ *    - Default setting
+ * 
+ * Features:
+ * - Automatic timestamps
+ * - Index management
+ * - Field validation
  */
 const userSchema = new mongoose.Schema({
     username: {
@@ -41,14 +84,41 @@ const userSchema = new mongoose.Schema({
     autoIndex: true      // Ensures indexes are created
 });
 
-// Create unique index on username field
-// This provides an additional layer of uniqueness constraint
+/**
+ * Username Index
+ * Creates a unique index for username lookups
+ * 
+ * Benefits:
+ * 1. Query Performance
+ *    - Faster username searches
+ *    - Efficient sorting
+ * 
+ * 2. Data Integrity
+ *    - Ensures uniqueness
+ *    - Prevents duplicates
+ *    - Database-level constraint
+ */
 userSchema.index({ username: 1 }, { unique: true });
 
 /**
  * Password Hashing Middleware
- * Automatically hashes password before saving to database
- * Only runs if password field has been modified
+ * Pre-save hook for password encryption
+ * 
+ * Features:
+ * 1. Security
+ *    - Bcrypt hashing
+ *    - Salt generation
+ *    - One-way encryption
+ * 
+ * 2. Optimization
+ *    - Conditional execution
+ *    - Change detection
+ *    - Async processing
+ * 
+ * 3. Error Handling
+ *    - Try-catch block
+ *    - Error propagation
+ *    - Middleware chain
  */
 userSchema.pre('save', async function(next) {
     try {
@@ -64,12 +134,28 @@ userSchema.pre('save', async function(next) {
 });
 
 /**
- * Password Comparison Method
- * Verifies if provided password matches stored hash
- * Used during user authentication
+ * Password Verification Method
+ * Instance method for password comparison
  * 
- * @param {string} enteredPassword - The password to verify
- * @returns {Promise<boolean>} - True if password matches
+ * Features:
+ * 1. Security
+ *    - Secure comparison
+ *    - Timing attack protection
+ *    - Hash verification
+ * 
+ * 2. Usage
+ *    - Authentication flow
+ *    - Login verification
+ *    - Password checks
+ * 
+ * 3. Error Handling
+ *    - Async/await pattern
+ *    - Error propagation
+ *    - Type safety
+ * 
+ * @param {string} enteredPassword - Password to verify
+ * @returns {Promise<boolean>} Verification result
+ * @throws {Error} Comparison failure
  */
 userSchema.methods.matchPassword = async function(enteredPassword) {
     try {
