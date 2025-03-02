@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import currencyService from '../services/currencyService';
 import './AdminDashboard.css'; // Added import for custom styles
@@ -70,20 +70,55 @@ const AdminDashboard = () => {
         rate: ''
     });
 
-    // Refs for GSAP animations - useRef hook creates mutable objects that persist across renders
+    /**
+     * Animation Refs
+     * DOM references for GSAP animations
+     */
     const cardRef = useRef(null);
     const tableRef = useRef(null);
     const titleRef = useRef(null);
     const modalRef = useRef(null);
-    const rowRefs = useRef([]);
 
-    /*
-     * useEffect hook for component lifecycle events
-     * This runs once after the component mounts (empty dependency array [])
-     * Similar to componentDidMount in class components
+    /**
+     * Currency Pairs Fetcher
+     * Fetches currency pairs from the API
+     * 
+     * Wrapped in useCallback to:
+     * 1. Prevent unnecessary recreations
+     * 2. Allow safe usage in useEffect dependencies
+     * 3. Maintain referential equality
+     * 
+     * @async
+     * @function
+     */
+    const fetchCurrencyPairs = useCallback(async () => {
+        try {
+            const response = await currencyService.getAllPairs(token);
+            if (response.success) {
+                setCurrencyPairs(response.data);
+            }
+        } catch (err) {
+            setError('Failed to fetch currency pairs');
+            if (cardRef.current) {
+                gsap.to(cardRef.current, {
+                    x: [-5, 5, -5, 5, 0],
+                    duration: 0.4,
+                    ease: 'power2.inOut'
+                });
+            }
+        }
+    }, [token, cardRef, setError]);
+
+    /**
+     * Initial Setup Effect
+     * Handles component initialization and animations
+     * 
+     * Note: fetchCurrencyPairs is included in dependencies
+     * to ensure proper data fetching behavior
      */
     useEffect(() => {
-        fetchCurrencyPairs(); // Fetch data when component mounts
+        // Initial data fetch
+        fetchCurrencyPairs();
 
         // Card entrance animation - demonstrates GSAP animation techniques
         gsap.fromTo(cardRef.current, // Target element
@@ -96,12 +131,11 @@ const AdminDashboard = () => {
             { y: -20, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.6, delay: 0.3, ease: 'back.out(1.7)' } // 'back' easing creates a slight overshoot effect
         );
-    }, []); // Empty dependency array means this effect runs once after initial render
+    }, [fetchCurrencyPairs]); // Include fetchCurrencyPairs in dependencies
 
-    /*
-     * This useEffect watches for changes to the currencyPairs state
-     * When data loads, it animates the table rows
-     * This demonstrates how to create dependent effects
+    /**
+     * Table Animation Effect
+     * Animates table rows when data loads
      */
     useEffect(() => {
         if (currencyPairs.length > 0 && tableRef.current) {
@@ -111,9 +145,12 @@ const AdminDashboard = () => {
                 { opacity: 1, y: 0, stagger: 0.05, duration: 0.4, ease: 'power1.out' } // Stagger creates a cascading effect
             );
         }
-    }, [currencyPairs]); // This effect runs whenever currencyPairs changes
+    }, [currencyPairs]);
 
-    // Modal animation effect - runs when showModal state changes
+    /**
+     * Modal Animation Effect
+     * Handles modal entrance animation
+     */
     useEffect(() => {
         if (showModal && modalRef.current) {
             gsap.fromTo(modalRef.current,
@@ -121,30 +158,7 @@ const AdminDashboard = () => {
                 { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)' }
             );
         }
-    }, [showModal]); // This effect runs whenever showModal changes
-
-    /*
-     * Async function to fetch data from the API
-     * Uses try/catch for error handling - important pattern for async operations
-     */
-    const fetchCurrencyPairs = async () => {
-        try {
-            const response = await currencyService.getAllPairs(token); // API call with authentication
-            if (response.success) {
-                setCurrencyPairs(response.data); // Update state with fetched data
-            }
-        } catch (err) {
-            setError('Failed to fetch currency pairs'); // Error handling
-            // Error shake animation - provides visual feedback for errors
-            if (cardRef.current) {
-                gsap.to(cardRef.current, {
-                    x: [-5, 5, -5, 5, 0], // Array creates a shake effect
-                    duration: 0.4,
-                    ease: 'power2.inOut'
-                });
-            }
-        }
-    };
+    }, [showModal]);
 
     /*
      * Modal open handler - demonstrates conditional state updates

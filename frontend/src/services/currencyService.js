@@ -59,10 +59,7 @@ const currencyService = {
             };
         } catch (error) {
             console.error('Error fetching pairs:', error);
-            throw {
-                success: false,
-                message: error.response?.data?.message || error.message || 'Error fetching currency pairs'
-            };
+            throw new Error(error.response?.data?.message || error.message || 'Error fetching currency pairs');
         }
     },
 
@@ -109,10 +106,7 @@ const currencyService = {
             };
         } catch (error) {
             console.error('Error converting:', error);
-            throw {
-                success: false,
-                message: error.response?.data?.message || error.message || 'Error converting currency'
-            };
+            throw new Error(error.response?.data?.message || error.message || 'Error converting currency');
         }
     },
 

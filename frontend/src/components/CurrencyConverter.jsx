@@ -36,13 +36,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import './CurrencyConverter.css';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { gsap } from 'gsap';
-gsap.registerPlugin(ScrollTrigger);
-
-import currencyService from '../services/currencyService';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAuth } from '../context/AuthContext';
+import currencyService from '../services/currencyService';
+import './CurrencyConverter.css';
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * CurrencyConverter Component
@@ -77,7 +78,6 @@ const CurrencyConverter = () => {
     const resultRef = React.useRef(null);
     const titleRef = React.useRef(null);
     const inputsRef = React.useRef(null);
-    const buttonRef = React.useRef(null);
 
     /**
      * Currency Pairs Initialization Effect
