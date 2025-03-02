@@ -1,0 +1,281 @@
+/* Admin Dashboard Styles */
+/* 
+ * CSS EDUCATIONAL NOTES FOR JUNIOR DEVELOPERS
+ * 
+ * This stylesheet follows modern CSS best practices with a focus on:
+ * 1. Glassmorphism design - Using background blur and transparency
+ * 2. Micro-interactions - Small animations on hover/active states
+ * 3. System font stack - For optimal performance and native feel
+ * 4. CSS Variables would be ideal here (not implemented yet)
+ * 5. BEM methodology could be applied for better organization
+ */
+
+/* Card Design - Glassmorphism Effect */
+/* 
+ * Glassmorphism creates a frosted glass appearance using:
+ * 1. Semi-transparent background (rgba)
+ * 2. Backdrop filter for blur effect
+ * 3. Subtle border for depth perception
+ * 4. Box-shadow for elevation
+ */
+.card {
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    backdrop-filter: blur(20px); /* Creates the frosted glass effect */
+    -webkit-backdrop-filter: blur(20px); /* Safari support */
+    border-radius: 18px; /* Rounded corners for modern UI */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    padding: 2rem; /* Generous padding for content breathing room */
+}
+
+/* Title Styling - Typography Best Practices */
+/* 
+ * Modern typography approach:
+ * 1. System font stack for performance and native feel
+ * 2. Negative letter-spacing for headlines (Apple-inspired)
+ * 3. Font weight 600 (semibold) for balanced emphasis
+ */
+.card-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; /* System font stack */
+    font-size: 2rem; /* 32px at default browser settings */
+    font-weight: 600; /* Semibold weight for balanced emphasis */
+    color: #1d1d1f; /* Near-black for better readability than pure black */
+    letter-spacing: -0.02em; /* Slight negative tracking for modern look */
+}
+
+/* Table Styles - Clean Data Presentation */
+/* 
+ * Modern table design principles:
+ * 1. Border-collapse: separate - Allows for space between cells
+ * 2. Border-spacing: 0 - Controls the exact spacing
+ * 3. Full width for responsive design
+ * 4. Consistent padding for alignment
+ */
+.table {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    border-collapse: separate; /* Allows for space between borders */
+    border-spacing: 0; /* No space between cells */
+    width: 100%; /* Full width for responsive design */
+    margin-bottom: 1rem; /* Space after table */
+}
+
+/* 
+ * Table header styling:
+ * 1. Semibold text for visual hierarchy
+ * 2. Slightly thicker bottom border to separate header from body
+ */
+.table th {
+    font-weight: 600; /* Semibold for headers */
+    color: #1d1d1f; /* Near-black for better readability */
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Subtle separator line */
+    padding: 1rem; /* Consistent padding */
+}
+
+/* 
+ * Table cell styling:
+ * 1. Consistent padding with headers
+ * 2. Lighter bottom border than headers
+ */
+.table td {
+    padding: 1rem; /* Same padding as headers for alignment */
+    color: #1d1d1f; /* Consistent text color */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Very subtle row separator */
+}
+
+/* 
+ * Striped table rows for better readability:
+ * 1. Extremely subtle background for odd rows
+ * 2. Slightly darker background on hover for interaction feedback
+ */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02); /* 2% black for subtle zebra striping */
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Slightly darker on hover */
+}
+
+/* Button Styles - Interactive Elements */
+/* 
+ * Primary button design:
+ * 1. Apple-inspired blue color
+ * 2. No border for clean look
+ * 3. Generous padding for touch targets
+ * 4. Border-radius for modern appearance
+ * 5. Transition for smooth hover/active states
+ */
+.btn-primary {
+    background-color: #0071e3; /* Apple-inspired blue */
+    color: white; /* High contrast text */
+    border-radius: 12px; /* Rounded corners */
+    padding: 0.75rem 1.5rem; /* Vertical, horizontal padding */
+    font-size: 1rem; /* Base font size */
+    font-weight: 500; /* Medium weight */
+    transition: all 0.2s ease; /* Smooth transition for all properties */
+    border: none; /* No border for clean look */
+}
+
+/* 
+ * Hover state - Micro-interaction:
+ * 1. Slightly brighter blue
+ * 2. Scale up slightly for subtle "push" effect
+ */
+.btn-primary:hover {
+    background-color: #0077ed; /* Slightly brighter blue */
+    transform: scale(1.02); /* Grow slightly on hover */
+}
+
+/* 
+ * Active state - Micro-interaction:
+ * 1. Slightly darker blue
+ * 2. Scale down slightly for "pressed" effect
+ */
+.btn-primary:active {
+    background-color: #006edb; /* Slightly darker blue */
+    transform: scale(0.98); /* Shrink slightly when pressed */
+}
+
+/* Action Buttons - Secondary Controls */
+/* 
+ * Outline button design:
+ * 1. Subtle background instead of borders
+ * 2. Smaller padding for secondary actions
+ * 3. Transitions for interactive feedback
+ */
+.btn-outline-primary, .btn-outline-danger {
+    border: none; /* No border */
+    background: rgba(0, 0, 0, 0.05); /* Very subtle gray background */
+    color: #1d1d1f; /* Near-black text */
+    border-radius: 8px; /* Slightly less rounded than primary */
+    padding: 0.5rem; /* Smaller padding than primary */
+    transition: all 0.2s ease; /* Smooth transition */
+}
+
+/* 
+ * Primary outline hover - Blue accent:
+ * 1. Blue tinted background
+ * 2. Blue text color
+ */
+.btn-outline-primary:hover {
+    background: rgba(0, 113, 227, 0.1); /* 10% blue background */
+    color: #0071e3; /* Blue text */
+}
+
+/* 
+ * Danger outline hover - Red accent:
+ * 1. Red tinted background
+ * 2. Red text color
+ */
+.btn-outline-danger:hover {
+    background: rgba(255, 59, 48, 0.1); /* 10% red background */
+    color: #ff3b30; /* Red text */
+}
+
+/* Modal Styles - Dialog Windows */
+/* 
+ * Modal content container:
+ * 1. Glassmorphism effect like cards
+ * 2. Higher backdrop-filter blur for prominence
+ * 3. Rounded corners for consistency
+ */
+.modal-content {
+    background: rgba(255, 255, 255, 0.95); /* More opaque than cards */
+    backdrop-filter: blur(20px); /* Frosted glass effect */
+    -webkit-backdrop-filter: blur(20px); /* Safari support */
+    border-radius: 18px; /* Consistent with card radius */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+}
+
+/* 
+ * Modal header styling:
+ * 1. Subtle bottom border
+ * 2. Generous padding
+ */
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Subtle separator */
+    padding: 1.5rem; /* Generous padding */
+}
+
+/* 
+ * Modal title typography:
+ * 1. System font stack
+ * 2. Semibold weight for emphasis
+ */
+.modal-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-weight: 600; /* Semibold */
+    color: #1d1d1f; /* Near-black */
+}
+
+/* 
+ * Modal body spacing:
+ * 1. Consistent padding with header
+ */
+.modal-body {
+    padding: 1.5rem; /* Same as header for consistency */
+}
+
+/* 
+ * Close button styling:
+ * 1. Circular background
+ * 2. Subtle hover effect
+ * 3. Scale animation for feedback
+ */
+.btn-close {
+    background: rgba(0, 0, 0, 0.05); /* Subtle background */
+    border-radius: 50%; /* Perfect circle */
+    padding: 0.5rem; /* Even padding */
+    transition: all 0.2s ease; /* Smooth transition */
+}
+
+.btn-close:hover {
+    background: rgba(0, 0, 0, 0.1); /* Darker on hover */
+    transform: scale(1.1); /* Grow slightly */
+}
+
+/* Form Controls - Input Elements */
+/* 
+ * Form input styling:
+ * 1. No borders for clean look
+ * 2. Subtle background for visibility
+ * 3. Rounded corners for consistency
+ * 4. Smooth transition for focus state
+ */
+.form-control {
+    border: none; /* No border */
+    background: rgba(0, 0, 0, 0.05); /* Subtle background */
+    border-radius: 12px; /* Rounded corners */
+    padding: 0.75rem 1rem; /* Vertical, horizontal padding */
+    font-size: 1rem; /* Base font size */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* 
+ * Focus state:
+ * 1. Slightly darker background
+ * 2. Blue glow effect with box-shadow
+ * 3. No default outline
+ */
+.form-control:focus {
+    background: rgba(0, 0, 0, 0.08); /* Slightly darker background */
+    box-shadow: 0 0 0 4px rgba(0, 125, 250, 0.15); /* Blue glow effect */
+    outline: none; /* Remove default browser outline */
+}
+
+/* Alert Styles - Notification Elements */
+/* 
+ * Danger alert styling:
+ * 1. Red tinted background
+ * 2. Red text for emphasis
+ * 3. No border for clean look
+ * 4. Rounded corners for consistency
+ * 5. Generous padding and margin
+ */
+.alert-danger {
+    background: rgba(255, 59, 48, 0.1); /* 10% red background */
+    border-radius: 12px; /* Rounded corners */
+    color: #ff3b30; /* Red text */
+    padding: 1rem; /* Even padding */
+    margin-bottom: 1.5rem; /* Space after alert */
+    border: none; /* No border */
+}

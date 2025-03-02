@@ -2,7 +2,8 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5;
+  background-color: #ffffff; /* Updated to a cleaner white background */
+  font-family: 'SF Pro Display', sans-serif; /* Added Apple-style font */
 }
 
 /* Container spacing */
@@ -11,16 +12,30 @@ body {
   padding-bottom: 2rem;
 }
 
-/* Form styles */
-.form-control:focus {
-  border-color: #1976d2;
-  box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+
+/* Container spacing */
+.container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
-/* Table styles */
-.MuiTableRow-root:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+/* Form styles */
+.form-control {
+  border: none; /* Updated to a cleaner look */
+  border-bottom: 1px solid #ccc; /* Added subtle bottom border */
 }
+
+.form-control:focus {
+  border-color: #007aff; /* Updated to match Apple style */
+  box-shadow: none; /* Removed shadow for a cleaner focus effect */
+}
+
+
+/* Table styles */
+.table-striped tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Updated hover effect for tables */
+}
+
 
 /* Currency converter result animation */
 @keyframes fadeIn {
@@ -38,9 +53,15 @@ body {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Additional styles for smooth transitions */
+.transition {
+  transition: all 0.3s ease; /* Added smooth transition for elements */
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  .MuiContainer-root {
+  .container {
     padding-left: 16px;
     padding-right: 16px;
   }

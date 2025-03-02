@@ -1,17 +1,38 @@
+// authController.js - Authentication and user management controller
+// This controller handles user registration, login, and profile management
+// Key features:
+// 1. User registration with validation
+// 2. Secure login with JWT
+// 3. Password validation
+// 4. Profile management
+// 5. Error handling
+
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/userModel');
 
-// Generate JWT Token
+/**
+ * Generates a JWT token for user authentication
+ * 
+ * @param {string} id - User ID to encode in the token
+ * @returns {string} JWT token valid for 30 days
+ */
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '30d'
     });
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
+/**
+ * Register a new user
+ * @route POST /api/auth/register
+ * @access Public
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} User data and authentication token
+ * @throws {Error} If registration fails
+ */
 const registerUser = async (req, res) => {
     try {
         // Validate request

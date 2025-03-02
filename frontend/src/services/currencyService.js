@@ -1,9 +1,24 @@
+// currencyService.js - API service for currency operations
+// This service handles all currency-related API calls to the backend
+// Key features:
+// 1. Currency pair fetching
+// 2. Currency conversion
+// 3. Rate management (admin only)
+// 4. Error handling and validation
+// 5. Authentication token management
+
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/currency';
 
 const currencyService = {
-    // Get all currency pairs
+    /**
+     * Fetches all available currency pairs from the server
+     * 
+     * @param {string} token - Authentication token
+     * @returns {Promise<Object>} Response containing currency pairs data
+     * @throws {Error} If the request fails or returns an error
+     */
     getAllPairs: async (token) => {
         try {
             const response = await axios.get(`${API_URL}/`, {
@@ -27,7 +42,16 @@ const currencyService = {
         }
     },
 
-    // Convert currency
+    /**
+     * Converts an amount from one currency to another
+     * 
+     * @param {string} baseCurrency - Source currency code (e.g., USD)
+     * @param {string} targetCurrency - Target currency code (e.g., EUR)
+     * @param {number} amount - Amount to convert
+     * @param {string} token - Authentication token
+     * @returns {Promise<Object>} Conversion result with rate and converted amount
+     * @throws {Error} If validation fails or conversion fails
+     */
     convertCurrency: async (baseCurrency, targetCurrency, amount, token) => {
         try {
             if (!amount || amount <= 0) {

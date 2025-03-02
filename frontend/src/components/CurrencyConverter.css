@@ -1,0 +1,123 @@
+/* Currency Converter Styles */
+
+/* Card Design */
+.card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+/* Title Styling */
+.apple-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0 4px rgba(0, 125, 250, 0.15);
+    outline: none;
+}
+
+/* Labels */
+.form-label {
+    font-weight: 500;
+    color: #1d1d1f;
+    margin-bottom: 0.5rem;
+}
+
+/* Button Styles */
+.btn-apple {
+    background-color: #0071e3;
+    color: white;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-apple:hover {
+    background-color: #0077ed;
+    transform: scale(1.02);
+}
+
+.btn-apple:active {
+    background-color: #006edb;
+    transform: scale(0.98);
+}
+
+.btn-apple:disabled {
+    background-color: #999;
+    opacity: 0.7;
+}
+
+/* Alert Styles */
+.apple-alert {
+    background: rgba(255, 59, 48, 0.1);
+    border-radius: 12px;
+    color: #ff3b30;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: none;
+}
+
+/* Result Display Styles */
+.apple-result {
+    color: #1d1d1f;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 1.5rem 0;
+}
+
+/* Swap Button */
+.btn-outline-secondary {
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    color: #1d1d1f;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1d1d1f;
+    transform: scale(1.05);
+}
+
+/* Container Spacing */
+.container {
+    padding: 2rem;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-width: 0.15em;
+}

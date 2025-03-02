@@ -1,7 +1,23 @@
+// authMiddleware.js - Authentication middleware for route protection
+// This middleware verifies JWT tokens and manages route access control
+// Key features:
+// 1. Token extraction and verification
+// 2. User authentication
+// 3. Route protection
+// 4. Error handling
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
-// Protect routes - verify JWT token
+/**
+ * Protect routes - Middleware to verify JWT token and authenticate users
+ * Used to restrict access to protected routes
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {void}
+ */
 const protect = async (req, res, next) => {
     try {
         let token;
@@ -46,6 +62,8 @@ const protect = async (req, res, next) => {
         });
     }
 };
+
+module.exports = { protect };
 
 // Admin middleware
 const admin = (req, res, next) => {
